@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="ITS440_Final_ProjectV2.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:ITS440_Final_ProjectV2"
+    xmlns:Pages="clr-namespace:ITS440_Final_ProjectV2.Pages"
+    Title="Game Completion Tracker">
+
+    <TabBar>
+        <ShellContent
+            Title="Steam Setup"
+            ContentTemplate="{DataTemplate local:SteamSetupPage}"
+            Route="steam-setup" />
+        
+        <ShellContent
+            Title="Add Custom"
+            ContentTemplate="{DataTemplate local:AddCustomGamePage}"
+            Route="add-custom" />
+        
+        <ShellContent
+            Title="Game List"
+            ContentTemplate="{DataTemplate local:GameListPage}"
+            Route="game-list" />
+        
+        <ShellContent
+            Title="Steam Auth"
+            ContentTemplate="{DataTemplate Pages:SteamAuthenticationPage}"
+            Route="steam-auth" />
+    </TabBar>
+
+</Shell>
