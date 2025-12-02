@@ -4,6 +4,8 @@ using ITS440_Final_ProjectV2.Services;
 
 namespace ITS440_Final_ProjectV2
 {
+    //api key: 64B7C74FE6D4EDAC2575FE05F3237CFF
+    //domain name: my-app
     public partial class MainPage1 : TabbedPage
     {
         private readonly GameDatabase _gameDatabase;
