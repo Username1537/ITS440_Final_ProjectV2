@@ -6,7 +6,7 @@ namespace ITS440_Final_ProjectV2;
 
 public partial class SteamSetupPage : ContentPage
 {
-    private readonly Services.GameDatabase _gameDatabase;
+    private readonly GameDatabase _gameDatabase;
     private readonly SteamApiService _steamApiService;
     private readonly SecureCredentialsService _credentialsService;
 
@@ -14,13 +14,10 @@ public partial class SteamSetupPage : ContentPage
     private Entry? _apiKeyEntry;
     private Entry? _steamIdEntry;
     private Button? _loadSteamGamesButton;
-    private Button? _navigateToAuthButton;
     private Label? _steamStatusLabel;
 
     public SteamSetupPage()
     {
-        //InitializeComponent();
-
         _gameDatabase = App.GameDatabase;
         _steamApiService = new SteamApiService();
         _credentialsService = new SecureCredentialsService();
@@ -32,24 +29,16 @@ public partial class SteamSetupPage : ContentPage
 
     private void InitializeUI()
     {
-        _navigateToAuthButton = new Button
-        {
-            Text = "Go to Steam Authentication",
-            Margin = new Thickness(15, 10),
-            BackgroundColor = Colors.DodgerBlue
-        };
-        _navigateToAuthButton.Clicked += OnNavigateToAuthenticationClicked;
-
         _apiKeyEntry = new Entry
         {
-            Placeholder = "Enter Steam API Key (or use Authentication tab)",
+            Placeholder = "Enter Steam API Key",
             Margin = new Thickness(15),
             IsPassword = true
         };
 
         _steamIdEntry = new Entry
         {
-            Placeholder = "Enter your Steam ID (or use Authentication tab)",
+            Placeholder = "Enter your Steam ID",
             Margin = new Thickness(15)
         };
 
@@ -63,7 +52,7 @@ public partial class SteamSetupPage : ContentPage
 
         _steamStatusLabel = new Label
         {
-            Text = "Use the Steam Authentication tab first, or enter credentials manually.",
+            Text = "Enter your credentials to load games from Steam.",
             Margin = new Thickness(15),
             TextColor = Colors.Gray
         };
@@ -91,19 +80,25 @@ public partial class SteamSetupPage : ContentPage
                         TextColor = Colors.Gray,
                         Margin = new Thickness(15, 0)
                     },
-                    _navigateToAuthButton,
+                    new Label
+                    {
+                        Text = "Get your API key at: https://steamcommunity.com/dev/apikey",
+                        FontSize = 12,
+                        TextColor = Colors.Gray,
+                        Margin = new Thickness(15, 0, 15, 10)
+                    },
+                    new Label
+                    {
+                        Text = "IMPORTANT: Make sure your Steam library is PUBLIC at https://steamcommunity.com/settings/privacy",
+                        FontSize = 11,
+                        TextColor = Colors.Orange,
+                        Margin = new Thickness(15)
+                    },
                     new BoxView
                     {
                         HeightRequest = 1,
                         BackgroundColor = Colors.LightGray,
                         Margin = new Thickness(15, 5)
-                    },
-                    new Label
-                    {
-                        Text = "Or enter manually:",
-                        FontSize = 12,
-                        FontAttributes = FontAttributes.Bold,
-                        Margin = new Thickness(15, 10, 15, 5)
                     },
                     _apiKeyEntry,
                     _steamIdEntry,
@@ -114,19 +109,6 @@ public partial class SteamSetupPage : ContentPage
         };
 
         Content = content;
-    }
-
-    private async void OnNavigateToAuthenticationClicked(object? sender, EventArgs e)
-    {
-        try
-        {
-            await Shell.Current.GoToAsync("///steam-auth");
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Navigation Error", $"Could not navigate to authentication: {ex.Message}", "OK");
-            Debug.WriteLine($"[Navigation] Error: {ex}");
-        }
     }
 
     private async void OnLoadSteamGamesClicked(object? sender, EventArgs e)
@@ -191,7 +173,7 @@ public partial class SteamSetupPage : ContentPage
             {
                 if (_steamStatusLabel != null)
                 {
-                    _steamStatusLabel.Text = "No games found. Check your Steam ID and privacy settings.";
+                    _steamStatusLabel.Text = "No games found. Ensure your Steam library is PUBLIC.";
                     _steamStatusLabel.TextColor = Colors.Orange;
                 }
                 return;

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using ITS440_Final_ProjectV2.Pages;
+
 using ITS440_Final_ProjectV2.Services;
 
 namespace ITS440_Final_ProjectV2
@@ -17,8 +17,6 @@ namespace ITS440_Final_ProjectV2
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            // Register pages for routing using the correct method
-            Routing.RegisterRoute("authentication", typeof(SteamAuthenticationPage));
 
             // Register services for dependency injection
             builder.Services.AddSingleton<SteamAuthenticationService>();
