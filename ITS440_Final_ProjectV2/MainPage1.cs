@@ -6,7 +6,7 @@ namespace ITS440_Final_ProjectV2
 {
     public partial class MainPage1 : TabbedPage
     {
-        private readonly GameDatabase _gameDatabase;
+        private readonly Services.GameDatabase _gameDatabase;
         private readonly SteamApiService _steamApiService;
         private readonly SecureCredentialsService _credentialsService;
 
@@ -19,7 +19,7 @@ namespace ITS440_Final_ProjectV2
 
         // Add Custom Game Tab Controls
         private Entry? _customGameTitleEntry;
-        private Button? _addCustomGameButton; //hello
+        private Button? _addCustomGameButton; 
         private Label? _addGameStatusLabel;
 
         // Game List Tab Controls
@@ -29,7 +29,7 @@ namespace ITS440_Final_ProjectV2
 
         public MainPage1()
         {
-            _gameDatabase = new GameDatabase();
+            _gameDatabase = new Services.GameDatabase();
             _steamApiService = new SteamApiService();
             _credentialsService = new SecureCredentialsService();
             _allGames = new List<Game>();

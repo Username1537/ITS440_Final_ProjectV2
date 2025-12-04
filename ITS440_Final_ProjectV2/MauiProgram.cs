@@ -24,7 +24,7 @@ namespace ITS440_Final_ProjectV2
             builder.Services.AddSingleton<SteamAuthenticationService>();
             builder.Services.AddSingleton<SecureCredentialsService>();
             builder.Services.AddSingleton<SteamApiService>();
-            builder.Services.AddSingleton<GameDatabase>();
+            builder.Services.AddSingleton<Services.GameDatabase>();
             builder.Services.AddSingleton<LogoutService>();
             builder.Services.AddSingleton<NavigationService>();
 

@@ -6,7 +6,7 @@ namespace ITS440_Final_ProjectV2;
 
 public partial class AddCustomGamePage : ContentPage
 {
-    private readonly GameDatabase _gameDatabase;
+    private readonly Services.GameDatabase _gameDatabase;
 
     private Entry? _customGameTitleEntry;
     private Button? _addCustomGameButton;
