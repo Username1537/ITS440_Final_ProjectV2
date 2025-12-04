@@ -5,7 +5,7 @@ namespace ITS440_Final_ProjectV2
 {
     public partial class App : Application
     {
-        public static GameDatabase GameDatabase { get; set; }
+        public static Services.GameDatabase GameDatabase { get; set; }
 
         public App()
         {
@@ -15,7 +15,7 @@ namespace ITS440_Final_ProjectV2
         protected override Window CreateWindow(IActivationState activationState)
         {
             // Initialize GameDatabase as a singleton
-            GameDatabase = new GameDatabase();
+            GameDatabase = new Services.GameDatabase();
             return new Window(new AppShell());
         }
     }

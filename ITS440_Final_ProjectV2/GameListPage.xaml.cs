@@ -6,7 +6,7 @@ namespace ITS440_Final_ProjectV2;
 
 public partial class GameListPage : ContentPage
 {
-    private readonly GameDatabase _gameDatabase;
+    private readonly Services.GameDatabase _gameDatabase;
     private List<Game> _allGames;
 
     private CollectionView? _gameCollectionView;
@@ -28,12 +28,20 @@ public partial class GameListPage : ContentPage
     {
         _filterPicker = new Picker
         {
-            Title = "Filter Games",
-            ItemsSource = new List<string> { "All Games", "Not Started", "Completed" },
+            Title = "Filter / Sort Games",
+            ItemsSource = new List<string>
+    {
+        "All Games",
+        "Not Started",
+        "Completed",
+        "Order by Importance",
+        "Order by Completion"
+    },
             SelectedIndex = 0,
             Margin = new Thickness(15)
         };
         _filterPicker.SelectedIndexChanged += OnFilterChanged;
+
 
         _gameCollectionView = new CollectionView
         {
@@ -124,6 +132,18 @@ public partial class GameListPage : ContentPage
         };
         deleteButton.Clicked += OnDeleteGameClicked;
 
+        var detailsButton = new Button
+        {
+            Text = "Details",
+            FontSize = 12,
+            Padding = new Thickness(10, 5),
+            BackgroundColor = Colors.SteelBlue,
+            CornerRadius = 5,
+            WidthRequest = 80
+        };
+        detailsButton.Clicked += OnDetailsClicked;
+
+
         var gameBorder = new Border
         {
             Padding = new Thickness(15),
@@ -155,7 +175,7 @@ public partial class GameListPage : ContentPage
                     {
                         Spacing = 10,
                         HorizontalOptions = LayoutOptions.End,
-                        Children = { deleteButton }
+                        Children = {detailsButton, deleteButton }
                     }
                 }
             }
@@ -178,6 +198,13 @@ public partial class GameListPage : ContentPage
             {
                 Debug.WriteLine($"[Update Game] Error: {ex.Message}");
             }
+        }
+    }
+    private async void OnDetailsClicked(object? sender, EventArgs e)
+    {
+        if (sender is Button btn && btn.BindingContext is Game game)
+        {
+            await Navigation.PushAsync(new GameDetailPage(game, _gameDatabase));
         }
     }
 
@@ -212,21 +239,30 @@ public partial class GameListPage : ContentPage
 
     private async Task ApplyFilter()
     {
-        if (_filterPicker != null && _gameCollectionView != null)
+        if (_filterPicker == null || _gameCollectionView == null) return;
+
+        IEnumerable<Game> filtered = _allGames;
+
+        switch (_filterPicker.SelectedIndex)
         {
-            if (_filterPicker.SelectedIndex == 1)
-            {
-                _gameCollectionView.ItemsSource = _allGames.Where(g => !g.IsCompleted).ToList();
-            }
-            else if (_filterPicker.SelectedIndex == 2)
-            {
-                _gameCollectionView.ItemsSource = _allGames.Where(g => g.IsCompleted).ToList();
-            }
-            else
-            {
-                _gameCollectionView.ItemsSource = _allGames;
-            }
+            case 1: // Not Started
+                filtered = _allGames.Where(g => !g.IsCompleted);
+                break;
+            case 2: // Completed
+                filtered = _allGames.Where(g => g.IsCompleted);
+                break;
+            case 3: // Order by Urgency (Priority ascending)
+                filtered = _allGames.OrderBy(g => g.Priority);
+                break;
+            case 4: // Order by Completion (Completed first)
+                filtered = _allGames.OrderByDescending(g => g.IsCompleted);
+                break;
+            default: // All Games
+                filtered = _allGames;
+                break;
         }
+
+        _gameCollectionView.ItemsSource = filtered.ToList();
         await Task.CompletedTask;
     }
 

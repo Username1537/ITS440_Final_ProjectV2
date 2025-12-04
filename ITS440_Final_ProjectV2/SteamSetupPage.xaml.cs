@@ -6,7 +6,7 @@ namespace ITS440_Final_ProjectV2;
 
 public partial class SteamSetupPage : ContentPage
 {
-    private readonly GameDatabase _gameDatabase;
+    private readonly Services.GameDatabase _gameDatabase;
     private readonly SteamApiService _steamApiService;
     private readonly SecureCredentialsService _credentialsService;
 
