@@ -52,9 +52,13 @@ namespace ITS440_Final_ProjectV2.Services
             try
             {
                 string url = $"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/" +
-                             $"?steamid={steamId}&key={apiKey}&format=json";
+                             $"?steamid={steamId}&key={apiKey}&format=json&include_appinfo=true&include_played_free_games=true";
 
                 var response = await _httpClient.GetFromJsonAsync<SteamGameResponse>(url);
+                
+                Debug.WriteLine($"[Steam API] Game count: {response?.response?.game_count}");
+                Debug.WriteLine($"[Steam API] Games returned: {response?.response?.games?.Count ?? 0}");
+                
                 return response?.response?.games ?? new List<SteamGame>();
             }
             catch (Exception ex)

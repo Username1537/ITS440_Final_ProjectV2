@@ -221,7 +221,7 @@ namespace ITS440_Final_ProjectV2
                 {
                     if (_steamStatusLabel != null)
                     {
-                        _steamStatusLabel.Text = "No games found. Check your Steam ID and privacy settings.";
+                        _steamStatusLabel.Text = "No games found. Make sure your Steam library is PUBLIC at: https://steamcommunity.com/settings/privacy";
                         _steamStatusLabel.TextColor = Colors.Orange;
                     }
                     return;
