@@ -1,4 +1,4 @@
-using ITS440_Final_ProjectV2.Models;
+﻿using ITS440_Final_ProjectV2.Models;
 using ITS440_Final_ProjectV2.Services;
 using System.Diagnostics;
 
@@ -11,6 +11,8 @@ public partial class GameDetailPage : ContentPage
 
     private Entry priorityEntry;
     private Editor notesEditor;
+    private int currentRating = 3;
+    private HorizontalStackLayout starsLayout;
 
     public GameDetailPage(Game game, Services.GameDatabase db)
     {
@@ -18,6 +20,8 @@ public partial class GameDetailPage : ContentPage
         _db = db;
 
         Title = $"{game.Title} Details";
+
+        currentRating = game.Rating > 0 ? game.Rating : 3;
 
         // Priority Entry
         priorityEntry = new Entry
@@ -32,6 +36,13 @@ public partial class GameDetailPage : ContentPage
             Text = _game.Notes,
             HeightRequest = 150
         };
+
+        // Stars Layout
+        starsLayout = new HorizontalStackLayout
+        {
+            Spacing = 5
+        };
+        BuildStars();
 
         // Save Button
         var saveButton = new Button
@@ -52,14 +63,45 @@ public partial class GameDetailPage : ContentPage
                 Children =
                 {
                     new Label { Text = game.Title, FontSize = 28, FontAttributes = FontAttributes.Bold },
+
                     new Label { Text = "Priority (lower = more important):" },
                     priorityEntry,
+
                     new Label { Text = "Notes:" },
                     notesEditor,
+
+                    new Label { Text = "Rating:" },
+                    starsLayout,
+
                     saveButton
                 }
             }
         };
+    }
+
+    private void BuildStars()
+    {
+        starsLayout.Children.Clear();
+        for (int i = 1; i <= 5; i++)
+        {
+            var starLabel = new Label
+            {
+                Text = i <= currentRating ? "★" : "☆",
+                FontSize = 32,
+                TextColor = Colors.Gold
+            };
+
+            int ratingValue = i;
+            var tapGesture = new TapGestureRecognizer();
+            tapGesture.Tapped += (s, e) =>
+            {
+                currentRating = ratingValue;
+                BuildStars(); // Rebuild to reflect updated rating
+            };
+            starLabel.GestureRecognizers.Add(tapGesture);
+
+            starsLayout.Children.Add(starLabel);
+        }
     }
 
     private async void SaveButton_Click(object? sender, EventArgs e)
@@ -69,10 +111,10 @@ public partial class GameDetailPage : ContentPage
             _game.Priority = p;
 
         _game.Notes = notesEditor.Text;
+        _game.Rating = currentRating;
 
         try
         {
-            // Use the passed-in database instance
             await _db.UpdateGameAsync(_game);
 
             await DisplayAlert("Saved", "Game details updated.", "OK");

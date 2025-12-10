@@ -33,20 +33,25 @@ public partial class SteamSetupPage : ContentPage
         {
             Placeholder = "Enter Steam API Key",
             Margin = new Thickness(15),
+            BackgroundColor = Colors.White,
+            TextColor = Colors.Black,
             IsPassword = true
         };
 
         _steamIdEntry = new Entry
         {
             Placeholder = "Enter your Steam ID",
-            Margin = new Thickness(15)
+            Margin = new Thickness(15),
+            BackgroundColor = Colors.White,
+            TextColor = Colors.Black
         };
 
         _loadSteamGamesButton = new Button
         {
             Text = "Load Steam Games",
             Margin = new Thickness(15, 10),
-            BackgroundColor = Colors.CornflowerBlue
+            BackgroundColor = Colors.CadetBlue,
+            TextColor = Colors.Black
         };
         _loadSteamGamesButton.Clicked += OnLoadSteamGamesClicked;
 
@@ -54,7 +59,8 @@ public partial class SteamSetupPage : ContentPage
         {
             Text = "Enter your credentials to load games from Steam.",
             Margin = new Thickness(15),
-            TextColor = Colors.Gray
+            BackgroundColor = Colors.White,
+            TextColor = Colors.Black          
         };
 
         var content = new ScrollView

@@ -1,5 +1,6 @@
+﻿using ITS440_Final_ProjectV2.Models;
 using ITS440_Final_ProjectV2.Services;
-using ITS440_Final_ProjectV2.Models;
+using Microsoft.Maui.Controls.Shapes;
 using System.Diagnostics;
 
 namespace ITS440_Final_ProjectV2;
@@ -14,7 +15,6 @@ public partial class GameListPage : ContentPage
 
     public GameListPage()
     {
-        //InitializeComponent();
 
         _gameDatabase = App.GameDatabase;
         _allGames = new List<Game>();
@@ -30,22 +30,24 @@ public partial class GameListPage : ContentPage
         {
             Title = "Filter / Sort Games",
             ItemsSource = new List<string>
-    {
-        "All Games",
-        "Not Started",
-        "Completed",
-        "Order by Importance",
-        "Order by Completion"
-    },
+            {
+                "All Games",
+                "Not Started",
+                "Completed",
+                "Order by Importance",
+                "Order by Completion"
+            },
             SelectedIndex = 0,
             Margin = new Thickness(15)
+,           BackgroundColor = Colors.White,
+            TextColor = Colors.Black
         };
         _filterPicker.SelectedIndexChanged += OnFilterChanged;
-
 
         _gameCollectionView = new CollectionView
         {
             Margin = new Thickness(10),
+            BackgroundColor = Colors.White,
             SelectionMode = SelectionMode.Single,
             ItemTemplate = new DataTemplate(CreateGameItemTemplate),
             EmptyView = new Label
@@ -74,6 +76,15 @@ public partial class GameListPage : ContentPage
             HorizontalTextAlignment = TextAlignment.Center
         };
 
+        var searchBar = new SearchBar
+        {
+            Placeholder = "Search games...",
+            Margin = new Thickness(15, 5),
+            BackgroundColor = Colors.White,
+            TextColor = Colors.Black
+        };
+        searchBar.TextChanged += OnSearchBarTextChanged;
+
         var content = new VerticalStackLayout
         {
             Padding = new Thickness(0, 10),
@@ -88,10 +99,13 @@ public partial class GameListPage : ContentPage
                     HorizontalOptions = LayoutOptions.Center,
                     Margin = new Thickness(15)
                 },
+                searchBar,
                 _filterPicker,
                 _gameCollectionView,
                 statsLabel,
-                refreshButton
+                refreshButton,
+                
+
             }
         };
 
@@ -100,113 +114,124 @@ public partial class GameListPage : ContentPage
 
     private Border CreateGameItemTemplate()
     {
-        var titleLabel = new Label
-        {
-            FontAttributes = FontAttributes.Bold,
-            FontSize = 16
-        };
-        titleLabel.SetBinding(Label.TextProperty, "Title");
-
-        var sourceLabel = new Label
-        {
-            FontSize = 12,
-            TextColor = Colors.Gray
-        };
-        sourceLabel.SetBinding(Label.TextProperty, "Source");
-
-        var checkbox = new CheckBox
-        {
-            VerticalOptions = LayoutOptions.Center
-        };
-        checkbox.SetBinding(CheckBox.IsCheckedProperty, "IsCompleted");
-        checkbox.CheckedChanged += OnGameCompletionToggled;
-
-        var deleteButton = new Button
-        {
-            Text = "Delete",
-            FontSize = 12,
-            Padding = new Thickness(10, 5),
-            BackgroundColor = Colors.Tomato,
-            CornerRadius = 5,
-            WidthRequest = 80
-        };
-        deleteButton.Clicked += OnDeleteGameClicked;
-
-        var detailsButton = new Button
-        {
-            Text = "Details",
-            FontSize = 12,
-            Padding = new Thickness(10, 5),
-            BackgroundColor = Colors.SteelBlue,
-            CornerRadius = 5,
-            WidthRequest = 80
-        };
-        detailsButton.Clicked += OnDetailsClicked;
-
-
-        var gameBorder = new Border
+        var border = new Border
         {
             Padding = new Thickness(15),
             Margin = new Thickness(10, 5),
-            Content = new VerticalStackLayout
+            StrokeShape = new RoundRectangle { CornerRadius = 10 },
+            BackgroundColor = Colors.LightBlue.WithAlpha(4)
+        };
+
+        // Image
+        var gameImage = new Image
+        {
+            WidthRequest = 100,
+            HeightRequest = 80,
+            Aspect = Aspect.AspectFill,
+            BackgroundColor = Colors.LightGray
+        };
+        gameImage.SetBinding(Image.SourceProperty, "ImagePath");
+
+        // Labels
+        var titleLabel = new Label { FontAttributes = FontAttributes.Bold, FontSize = 16 };
+        titleLabel.SetBinding(Label.TextProperty, "Title");
+
+        var sourceLabel = new Label { FontSize = 12, TextColor = Colors.Gray };
+        sourceLabel.SetBinding(Label.TextProperty, "Source");
+
+        var notesLabel = new Label { FontSize = 12, TextColor = Colors.Green };
+        notesLabel.SetBinding(Label.TextProperty, "Notes");
+
+        var priorityLabel = new Label { FontSize = 12, TextColor = Colors.Purple };
+        priorityLabel.SetBinding(Label.TextProperty, new Binding("Priority", stringFormat: "Priority: {0}"));
+
+        var ratingLabel = new Label { FontSize = 12, TextColor = Colors.Goldenrod };
+        ratingLabel.SetBinding(Label.TextProperty, new Binding("Rating", stringFormat: "Rating: {0}/5"));
+
+        // Buttons
+        var deleteButton = new Button
+        {
+            Text = "Delete",
+            BackgroundColor = Colors.IndianRed,
+            TextColor = Colors.White,
+            Padding = new Thickness(10, 5),
+            CornerRadius = 5,
+            WidthRequest = 80
+        };
+        deleteButton.SetBinding(Button.BindingContextProperty, ".");
+        deleteButton.Clicked += OnDeleteGameClicked;
+
+        var completeButton = new Button
+        {
+            Text = "Mark Completed",
+            BackgroundColor = Colors.LimeGreen,
+            TextColor = Colors.White,
+            Padding = new Thickness(10, 5),
+            CornerRadius = 5
+        };
+        completeButton.SetBinding(Button.BindingContextProperty, ".");
+        completeButton.Clicked += async (s, e) =>
+        {
+            if (completeButton.BindingContext is Game game && !game.IsCompleted)
             {
-                Spacing = 8,
-                Children =
-                {
-                    new HorizontalStackLayout
-                    {
-                        Spacing = 10,
-                        Children =
-                        {
-                            new VerticalStackLayout
-                            {
-                                HorizontalOptions = LayoutOptions.Center,
-                                Spacing = 3,
-                                Children = { titleLabel, sourceLabel }
-                            },
-                            new VerticalStackLayout
-                            {
-                                VerticalOptions = LayoutOptions.Center,
-                                Children = { checkbox }
-                            }
-                        }
-                    },
-                    new HorizontalStackLayout
-                    {
-                        Spacing = 10,
-                        HorizontalOptions = LayoutOptions.End,
-                        Children = {detailsButton, deleteButton }
-                    }
-                }
+                game.IsCompleted = true;
+                game.Notes = $"Completed on {DateTime.Now:MM/dd/yyyy}";
+                await _gameDatabase.UpdateGameAsync(game);
+                await LoadGamesAsync();
             }
         };
 
-        return gameBorder;
+        var editButton = new Button
+        {
+            Text = "Edit",
+            BackgroundColor = Colors.CadetBlue,
+            TextColor = Colors.White,
+            Padding = new Thickness(10, 5),
+            CornerRadius = 5,
+            WidthRequest = 80
+        };
+        editButton.SetBinding(Button.BindingContextProperty, ".");
+        editButton.Clicked += async (s, e) =>
+        {
+            if (editButton.BindingContext is Game game)
+            {
+                await Navigation.PushAsync(new GameDetailPage(game, _gameDatabase));
+            }
+        };
+
+        var buttonsRow = new HorizontalStackLayout
+        {
+            Spacing = 10,
+            Children = { completeButton, deleteButton, editButton }
+        };
+
+        // Layout
+        var mainLayout = new HorizontalStackLayout
+        {
+            Spacing = 10,
+            Children =
+        {
+            gameImage,
+            new VerticalStackLayout
+            {
+                Spacing = 5,
+                Children =
+                {
+                    titleLabel,
+                    sourceLabel,
+                    notesLabel,
+                    ratingLabel,
+                    priorityLabel,
+                    buttonsRow
+                }
+            }
+        }
+        };
+
+        border.Content = mainLayout;
+        return border;
     }
 
-    private async void OnGameCompletionToggled(object? sender, CheckedChangedEventArgs e)
-    {
-        if (sender is CheckBox checkbox && checkbox.BindingContext is Game game)
-        {
-            game.IsCompleted = e.Value;
-            try
-            {
-                await _gameDatabase.UpdateGameAsync(game);
-                Debug.WriteLine($"[Game] Toggled completion status for: {game.Title}");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[Update Game] Error: {ex.Message}");
-            }
-        }
-    }
-    private async void OnDetailsClicked(object? sender, EventArgs e)
-    {
-        if (sender is Button btn && btn.BindingContext is Game game)
-        {
-            await Navigation.PushAsync(new GameDetailPage(game, _gameDatabase));
-        }
-    }
 
     private async void OnDeleteGameClicked(object? sender, EventArgs e)
     {
@@ -217,20 +242,14 @@ public partial class GameListPage : ContentPage
 
             if (confirm)
             {
-                try
-                {
-                    await _gameDatabase.DeleteGameAsync(game.Id);
-                    await LoadGamesAsync();
-                    Debug.WriteLine($"[Game] Deleted: {game.Title}");
-                }
-                catch (Exception ex)
-                {
-                    await DisplayAlert("Error", $"Failed to delete game: {ex.Message}", "OK");
-                    Debug.WriteLine($"[Delete Game] Error: {ex.Message}");
-                }
+                await _gameDatabase.DeleteGameAsync(game.Id);
+                await LoadGamesAsync();
+                Debug.WriteLine($"[Game] Deleted: {game.Title}");
             }
         }
     }
+
+
 
     private async void OnFilterChanged(object? sender, EventArgs e)
     {
@@ -259,6 +278,37 @@ public partial class GameListPage : ContentPage
                 break;
             default: // All Games
                 filtered = _allGames;
+                break;
+        }
+
+        _gameCollectionView.ItemsSource = filtered.ToList();
+        await Task.CompletedTask;
+    }
+
+    private async void OnSearchBarTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        if (_gameCollectionView == null) return;
+
+        string query = e.NewTextValue?.ToLower() ?? string.Empty;
+
+        var filtered = _allGames.Where(g =>
+            string.IsNullOrWhiteSpace(query) ||
+            g.Title.ToLower().Contains(query));
+
+        // Apply filter picker on top of search
+        switch (_filterPicker?.SelectedIndex)
+        {
+            case 1: // Not Started
+                filtered = filtered.Where(g => !g.IsCompleted);
+                break;
+            case 2: // Completed
+                filtered = filtered.Where(g => g.IsCompleted);
+                break;
+            case 3: // Order by Priority
+                filtered = filtered.OrderBy(g => g.Priority);
+                break;
+            case 4: // Order by Completion
+                filtered = filtered.OrderByDescending(g => g.IsCompleted);
                 break;
         }
 

@@ -22,6 +22,7 @@ namespace ITS440_Final_ProjectV2.Services
             {
                 await _database.CreateTableAsync<Game>();
             }
+
             catch (Exception ex)
             {
                 Debug.WriteLine($"[Database] Initialization error: {ex.Message}");
